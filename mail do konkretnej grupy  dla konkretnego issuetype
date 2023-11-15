@@ -1,0 +1,27 @@
+//send a custom email (postfunkcja scriptrunnerowa)
+
+// Condition and configuration
+
+import com.atlassian.jira.component.ComponentAccessor
+
+config.baseUrl = ComponentAccessor.getApplicationProperties().getString("http://192.168.1.26:8080/")
+def groupManager = ComponentAccessor.getGroupManager()
+
+def issueTypeToGroup = ["Epic":"jira-administrators", "Story":"testowa_1", "Task":"testowa_2"]
+def issueType = issue.getIssueType().getName()
+def group = issueTypeToGroup.get(issueType)
+def usersInGroup = groupManager.getUsersInGroup(group)
+
+def emailList = usersInGroup.collect() {user -> user.getEmailAddress()}
+
+mail.setTo(String.join(", ", emailList))
+
+
+// Email template
+//Szanowny u?ytkowniku, <br />
+//Zostało za?o?one zg?oszenie <a href=${config.baseUrl}/browse/${issue.getKey()}</a>, które wymaga Twojej akceptacji.
+
+//subject template
+//Zatwierdzenie zg?oszenia ${issue.getKey()}
+//html
+//zaznaczamy disable validators
